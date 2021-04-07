@@ -1,4 +1,5 @@
 const axios = require('axios')
+const fs = require('fs')
 require('dotenv').config()
 
 
@@ -6,12 +7,29 @@ require('dotenv').config()
 
 class Busquedas{
  
-  historial = ['Madrid','Japon']
+  historial = []
+  path = './db/database.json'
 
   constructor(){
      
-    //TODO: leer de bd si existe
+    this.leerBD()
 
+  }
+
+  get historial(){
+    return this.historial
+  }
+
+  get historialCapitalizado(){
+     return this.historial.map( lugar =>{
+          
+         let palabras = lugar.split(' ')
+
+        palabras =  palabras.map( p => p[0].toUpperCase() + p.substring(1) );
+
+        return palabras.join(' ')
+      
+     })
   }
 
   get paramsMapbox(){
@@ -93,6 +111,46 @@ class Busquedas{
     }
 
 
+  }
+
+
+  guardarHistorial( lugar = ''){
+      
+     if(this.historial.includes(lugar.toLocaleLowerCase())) {
+       return
+     } 
+     
+     this.historial = this.historial.splice(0,5)
+
+     this.historial.unshift(lugar.toLocaleLowerCase());
+
+     this.guardarDB()
+
+  }
+
+ async guardarDB(){
+
+    const payload = {
+ 
+      historial : this.historial
+
+    }
+     
+    await fs.writeFileSync(this.path , JSON.stringify(payload))
+
+  }
+
+  leerBD(){
+       
+       if(fs.existsSync(this.path)){
+
+           const info = fs.readFileSync(this.path,{encoding:'utf-8'})
+
+           this.historial = JSON.parse(info).historial
+
+       }
+
+ 
   }
 
 

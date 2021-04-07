@@ -18,7 +18,11 @@ const main = async () =>{
              const lugares   = await busqueda.buscarCiudad(lugar)
              const select_id = await listadoLugares(lugares)
 
+             if(select_id == '0') continue;
+
              const select_obj = lugares.find( item => item.id === select_id );
+
+             busqueda.guardarHistorial(select_obj.name);
 
             //Clima
             const clima = await busqueda.getWeatherByLatLng(select_obj.lat,select_obj.lng);
@@ -29,14 +33,19 @@ const main = async () =>{
             console.log('Ciudad:', select_obj.name);
             console.log('Lat:',select_obj.lat);
             console.log('Lng:',select_obj.lng);
-            console.log('Tiempo:',clima.desc.green);
+            console.log('Tiempo:',(clima.desc) ?  clima.desc.green : 'No informacion'.red);
             console.log('Temperatura:',clima.temp);
             console.log('Mínima:',clima.min);
             console.log('Máxima:',clima.max);          
              
             break;
            case '2':
-               console.log('Opcion', opt );
+                busqueda.historialCapitalizado.forEach( ( lugar,i ) => {
+                   
+                   const idx = `${i + 1}.`.green
+                   console.log(`${idx} ${lugar}`);
+
+                 } );
                break;
            
        }
